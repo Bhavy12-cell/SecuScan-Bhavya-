@@ -326,7 +326,7 @@ async def download_csv_report(task_id: str):
     return Response(
         content=csv_data,
         media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename={build_report_filename(dict(task_row), 'csv')}"}
+        headers={"Content-Disposition": f'attachment; filename="{build_report_filename(dict(task_row), "csv")}"'}
     )
 
 @router.get("/task/{task_id}/report/html")
@@ -353,7 +353,7 @@ async def download_html_report(task_id: str):
     return Response(
         content=html_content,
         media_type="text/html",
-        headers={"Content-Disposition": f"attachment; filename={build_report_filename(dict(task_row), 'html')}"}
+        headers={"Content-Disposition": f'attachment; filename="{build_report_filename(dict(task_row), "html")}"'}
     )
 
 @router.get("/task/{task_id}/report/pdf")
@@ -371,16 +371,16 @@ async def download_pdf_report(task_id: str):
     if task_row["status"] not in ["completed", "failed"]:
         raise HTTPException(status_code=400, detail="Task is not finished yet")
 
+    structured_data = json.loads(task_row["structured_json"]) if task_row["structured_json"] else {}
     try:
-        structured_data = json.loads(task_row["structured_json"]) if task_row["structured_json"] else {}
-        pdf_bytes = bytes(reporting.generate_pdf_report(dict(task_row), {"structured": structured_data}))
+        pdf_bytes = reporting.generate_pdf_report(dict(task_row), {"structured": structured_data})
     except Exception:
         return _report_generation_error_response(task_id, "pdf")
 
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={build_report_filename(dict(task_row), 'pdf')}"}
+        headers={"Content-Disposition": f'attachment; filename="{build_report_filename(dict(task_row), "pdf")}"'}
     )
 
 
@@ -408,7 +408,7 @@ async def download_sarif_report(task_id: str):
     return Response(
         content=sarif_data,
         media_type="application/sarif+json",
-        headers={"Content-Disposition": f"attachment; filename={build_report_filename(dict(task_row), 'sarif')}"}
+        headers={"Content-Disposition": f'attachment; filename="{build_report_filename(dict(task_row), "sarif")}"'}
     )
 
 
